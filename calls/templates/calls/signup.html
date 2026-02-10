@@ -49,8 +49,7 @@
             {% if field.name != 'username' and field.name != 'phone_number' %}
             <div>
                 <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                    {% if field.label == 'Password confirmation' %}Confirm Password{% else %}{{ field.label }}{% endif
-                    %}
+                    {% if field.label == 'Password confirmation' %}Confirm Password{% else %}{{ field.label }}{% endif %}
                 </label>
                 <div class="mt-1">
                     {{ field }}
