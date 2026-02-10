@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=pbx_calls_db
+      - POSTGRES_USER=pbx_user
+      - POSTGRES_PASSWORD=pbx_password
+    ports:
+      - "5435:5432"
+
+volumes:
+  postgres_data:
