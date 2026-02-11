@@ -40,7 +40,10 @@ class PlayAudioView(LoginRequiredMixin, View):
 
         # The path stored in wav_filename might be just the filename or full path
         # The management command stores os.path.join(root, file) which is absolute path
-        file_path = call.wav_filename
+        # The path stored in wav_filename is relative: caller_id/filename.wav
+        # We need to join it with the base recordings directory
+        recordings_root = getattr(settings, 'RECORDINGS_ROOT', '/usr/local/share/asterisk/sounds/call_sessions')
+        file_path = os.path.join(recordings_root, call.wav_filename)
         
         if not os.path.exists(file_path):
              raise Http404("Audio file not found on server")

@@ -90,7 +90,7 @@ class Command(BaseCommand):
                         defaults={
                             'user': user,
                             'caller_id': caller_id,
-                            'wav_filename': file,
+                            'wav_filename': os.path.join(caller_id, file),
                             'txt_filename': txt_filename,
                             'wav_size': wav_size,
                             'txt_size': txt_size,
