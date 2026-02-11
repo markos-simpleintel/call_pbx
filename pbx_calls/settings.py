@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,8 +80,8 @@ DATABASES = {
         'NAME': 'pbx_calls_db',
         'USER': 'pbx_user',
         'PASSWORD': 'pbx_password',
-        'HOST': 'localhost',
-        'PORT': '5435',
+        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5435'),
     }
 }
 

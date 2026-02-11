@@ -12,5 +12,22 @@ services:
     ports:
       - "5435:5432"
 
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - /usr/local/share/asterisk/sounds:/usr/local/share/asterisk/sounds:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_DB=pbx_calls_db
+      - POSTGRES_USER=pbx_user
+      - POSTGRES_PASSWORD=pbx_password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+
 volumes:
   postgres_data:
