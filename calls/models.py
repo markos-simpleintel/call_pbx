@@ -16,6 +16,7 @@ class Call(models.Model):
     caller_id = models.CharField(max_length=20)
     session_id = models.CharField(max_length=100, unique=True)
     wav_filename = models.CharField(max_length=255)
+    full_conversation_filename = models.CharField(max_length=255, blank=True, null=True)
     txt_filename = models.CharField(max_length=255, blank=True)
     wav_size = models.BigIntegerField(default=0)
     txt_size = models.BigIntegerField(default=0)
