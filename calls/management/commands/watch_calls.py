@@ -102,14 +102,21 @@ class Command(BaseCommand):
         path = options['path']
         if not os.path.exists(path):
             self.stdout.write(self.style.WARNING(f"Path {path} does not exist. Waiting..."))
-            # In a real scenario, we might want to loop and wait for the mount
             
+        # Initial Scan
+        self.stdout.write(f"Performing initial scan of {path}...")
+        handler = CallHandler(self.stdout)
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if file.endswith('_full.wav'):
+                    handler.process_file(os.path.join(root, file))
+        self.stdout.write(self.style.SUCCESS("Initial scan complete."))
+
         self.stdout.write(f"Starting watchdog on {path}...")
         
-        event_handler = CallHandler(self.stdout)
         # We use the native Observer (Inotify on Linux) for efficient event sensing
         observer = Observer()
-        observer.schedule(event_handler, path, recursive=True)
+        observer.schedule(handler, path, recursive=True)
         observer.start()
 
         try:
