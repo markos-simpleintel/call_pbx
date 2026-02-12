@@ -9,8 +9,9 @@ from watchdog.events import FileSystemEventHandler
 from calls.models import Call, User
 
 class CallHandler(FileSystemEventHandler):
-    def __init__(self, stdout):
+    def __init__(self, stdout, style):
         self.stdout = stdout
+        self.style = style
 
     def on_created(self, event):
         if event.is_directory:
@@ -105,7 +106,7 @@ class Command(BaseCommand):
             
         # Initial Scan
         self.stdout.write(f"Performing initial scan of {path}...")
-        handler = CallHandler(self.stdout)
+        handler = CallHandler(self.stdout, self.style)
         for root, dirs, files in os.walk(path):
             for file in files:
                 if file.endswith('_full.wav'):
