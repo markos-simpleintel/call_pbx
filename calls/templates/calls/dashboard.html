@@ -3,134 +3,149 @@
 {% block title %}Dashboard - PBX Manager{% endblock %}
 
 {% block content %}
-<div class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+<div class="bg-gray-900 pb-12">
+    <!-- Header Section -->
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center bg-gray-900 border-b border-gray-800 mb-6">
         <div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Call History</h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">Recordings for {{ user.phone_number }}</p>
+            <h3 class="text-2xl leading-6 font-bold text-white mb-2">Call History</h3>
+            <p class="max-w-2xl text-sm text-gray-400">Recordings for {{ user.phone_number }}</p>
         </div>
-        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800"> Total Calls: {{ page_obj.paginator.count }} </span>
+        <span
+            class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-900 text-blue-200 border border-blue-700 shadow-sm">
+            Total Calls: {{ page_obj.paginator.count|default:"0" }}
+        </span>
     </div>
-    <div class="border-t border-gray-200">
-        <ul role="list" class="divide-y divide-gray-200">
-            {% for call in object_list %}
-            <li class="px-4 py-4 sm:px-6 hover:bg-gray-50 transition duration-150 ease-in-out">
-                <div class="flex items-center justify-between">
-                    <div class="flex flex-col">
-                        <p class="text-sm font-medium text-indigo-600 truncate">
-                            Session: {{ call.session_id }}
-                        </p>
-                        <p class="mt-2 flex items-center text-sm text-gray-500">
-                            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            {{ call.created_at|date:"F j, Y, P" }}
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500">Size: {{ call.wav_size|filesizeformat }}</p>
-                    </div>
-                    <div class="flex flex-col space-y-2">
-                        <!-- Filtered Audio -->
-                        <div class="flex items-center space-x-4">
-                            <span class="text-xs text-gray-500 w-16">Filtered:</span>
-                            <audio controls class="h-8 w-64">
-                                <source src="{% url 'play_audio' pk=call.pk %}" type="audio/wav">
-                                Your browser does not support the audio element.
-                            </audio>
-                            <a href="{% url 'play_audio' pk=call.pk %}?download=true"
-                                class="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                title="Download Filtered">
-                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                            </a>
-                        </div>
 
-                        <!-- Full Conversion Audio -->
-                        {% if call.full_conversation_filename %}
-                        <div class="flex items-center space-x-4">
-                            <span class="text-xs text-gray-500 w-16">Unfiltered:</span>
-                            <audio controls class="h-8 w-64">
-                                <source src="{% url 'play_audio' pk=call.pk %}?type=conversation" type="audio/wav">
-                                Your browser does not support the audio element.
-                            </audio>
-                            <a href="{% url 'play_audio' pk=call.pk %}?type=conversation&download=true"
-                                class="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                title="Download Unfiltered">
-                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                            </a>
+    <!-- Calls List -->
+    <div class="space-y-4 px-4 sm:px-0">
+        {% for call in object_list %}
+        <div
+            class="bg-gray-800 shadow-md rounded-xl border border-gray-700 p-4 sm:p-6 transition duration-200 hover:border-gray-600">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+
+                <!-- Left Info Section -->
+                <div class="flex items-center flex-1 min-w-0">
+                    <div class="flex-shrink-0 mr-4">
+                        <!-- Folder Icon -->
+                        <div
+                            class="h-12 w-12 rounded-xl bg-gray-700/50 border border-gray-600 flex items-center justify-center">
+                            <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                            </svg>
                         </div>
-                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-blue-400 truncate">
+                            Session: {{ call.session_id }}
+                        </h4>
+                        <div class="mt-1 flex items-center text-sm text-gray-400">
+                            <!-- Calendar Icon -->
+                            <!-- <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                             </svg> -->
+                            {{ call.created_at|date:"F j, Y, g:i a" }}
+                            <span class="mx-2 text-gray-600">|</span>
+                            Size: {{ call.wav_size|filesizeformat }}
+                        </div>
                     </div>
                 </div>
-            </li>
-            {% empty %}
-            <li class="px-4 py-8 text-center text-gray-500">
-                No calls found.
-            </li>
-            {% endfor %}
-        </ul>
+
+                <!-- Right Audio Section -->
+                <div class="flex flex-col space-y-3 w-full sm:w-auto flex-shrink-0">
+                    <!-- Filtered Audio Row -->
+                    <div class="flex items-center justify-end space-x-3">
+                        <span
+                            class="text-xs font-medium text-gray-400 w-16 text-right uppercase tracking-wider">Filtered:</span>
+                        <audio controls class="h-8 w-48 sm:w-64 opacity-90 hover:opacity-100 transition"
+                            style="filter: invert(1) hue-rotate(180deg);">
+                            <source src="{% url 'play_audio' pk=call.pk %}" type="audio/wav">
+                        </audio>
+                        <a href="{% url 'play_audio' pk=call.pk %}?download=true"
+                            class="flex-shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-700 hover:bg-gray-600 text-green-500 border border-gray-600 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            title="Download Filtered">
+                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Unfiltered Audio Row (Conditional) -->
+                    {% if call.full_conversation_filename %}
+                    <div class="flex items-center justify-end space-x-3">
+                        <span
+                            class="text-xs font-medium text-gray-400 w-16 text-right uppercase tracking-wider">Unfiltered:</span>
+                        <audio controls class="h-8 w-48 sm:w-64 opacity-90 hover:opacity-100 transition"
+                            style="filter: invert(1) hue-rotate(180deg);">
+                            <source src="{% url 'play_audio' pk=call.pk %}?type=conversation" type="audio/wav">
+                        </audio>
+                        <a href="{% url 'play_audio' pk=call.pk %}?type=conversation&download=true"
+                            class="flex-shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-700 hover:bg-gray-600 text-green-500 border border-gray-600 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            title="Download Unfiltered">
+                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="bg-gray-800 shadow-md rounded-xl border border-gray-700 p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-white">No calls found</h3>
+            <p class="mt-1 text-sm text-gray-400">Calls recorded for your number will appear here automatically.</p>
+        </div>
+        {% endfor %}
     </div>
+
+    <!-- Pagination -->
     {% if is_paginated %}
-    <div class="bg-white px-4 py-3 border-t border-gray-200 flex items-center justify-between sm:px-6">
-        <div class="flex-1 flex justify-between sm:hidden">
+    <nav class="border-t border-gray-800 px-4 flex items-center justify-between sm:px-0 mt-8">
+        <div class="-mt-px w-0 flex-1 flex">
             {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}"
-                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+                class="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-400 hover:text-white hover:border-gray-300 transition">
+                <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+                Previous
+            </a>
             {% endif %}
+        </div>
+        <div class="hidden md:-mt-px md:flex">
+            <span class="pt-4 text-sm font-medium text-gray-500">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+        </div>
+        <div class="-mt-px w-0 flex-1 flex justify-end">
             {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}"
-                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
+                class="border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-400 hover:text-white hover:border-gray-300 transition">
+                Next
+                <svg class="ml-3 h-5 w-5 text-gray-400 group-hover:text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+            </a>
             {% endif %}
         </div>
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-                <p class="text-sm text-gray-700">
-                    Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span
-                        class="font-medium">{{page_obj.end_index }}</span> of <span class="font-medium">{{
-                        page_obj.paginator.count }}</span>
-                    results
-                </p>
-            </div>
-            <div>
-                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}"
-                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                        <span class="sr-only">Previous</span>
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                            aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                    {% endif %}
-                    <!-- Number links omitted for brevity, just Prev/Next for now -->
-                    {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}"
-                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                        <span class="sr-only">Next</span>
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                            aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                    {% endif %}
-                </nav>
-            </div>
-        </div>
-    </div>
+    </nav>
     {% endif %}
 </div>
 {% endblock %}

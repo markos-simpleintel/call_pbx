@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,29 +8,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
 
-    <nav class="bg-white border-b border-gray-200">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+
+    <nav class="bg-gray-800 border-b border-gray-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <span class="text-xl font-bold text-indigo-600">PBX Manager</span>
+                        <span class="text-xl font-bold text-indigo-400">PBX Manager</span>
                     </div>
                 </div>
                 <div class="flex items-center">
                     {% if user.is_authenticated %}
-                        <span class="text-gray-700 mr-4">{{ user.phone_number }}</span>
-                        <form method="post" action="{% url 'logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="text-sm text-gray-500 hover:text-gray-900">Logout</button>
-                        </form>
+                    <span class="text-gray-700 mr-4">{{ user.phone_number }}</span>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-sm text-gray-500 hover:text-gray-900">Logout</button>
+                    </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="text-sm text-gray-500 hover:text-gray-900 mr-4">Login</a>
-                        <a href="{% url 'signup' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Sign up</a>
+                    <a href="{% url 'login' %}" class="text-sm text-gray-500 hover:text-gray-900 mr-4">Login</a>
+                    <a href="{% url 'signup' %}"
+                        class="px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Sign
+                        up</a>
                     {% endif %}
                 </div>
             </div>
@@ -38,13 +44,14 @@
 
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                    <div class="p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div
+                class="p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}">
+                {{ message }}
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
 
         {% block content %}{% endblock %}
@@ -57,4 +64,5 @@
     </footer> -->
 
 </body>
+
 </html>
