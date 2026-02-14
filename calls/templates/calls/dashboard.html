@@ -32,23 +32,45 @@
                             {{ call.created_at|date:"F j, Y, P" }}
                         </p>
                         <p class="mt-1 text-sm text-gray-500">Size: {{ call.wav_size|filesizeformat }}</p>
-                        {% if call.full_conversation_filename %}
-                        <p class="mt-1 text-sm text-gray-500">Transcript: {{ call.full_conversation_filename }}</p>
-                        {% endif %}
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <audio controls class="h-8 w-64">
-                            <source src="{% url 'play_audio' pk=call.pk %}" type="audio/wav">
-                            Your browser does not support the audio element.
-                        </audio>
-                        <a href="{% url 'play_audio' pk=call.pk %}?download=true"
-                            class="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                        </a>
+                    <div class="flex flex-col space-y-2">
+                        <!-- Filtered Audio -->
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xs text-gray-500 w-16">Filtered:</span>
+                            <audio controls class="h-8 w-64">
+                                <source src="{% url 'play_audio' pk=call.pk %}" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <a href="{% url 'play_audio' pk=call.pk %}?download=true"
+                                class="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                title="Download Filtered">
+                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                            </a>
+                        </div>
+
+                        <!-- Full Conversion Audio -->
+                        {% if call.full_conversation_filename %}
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xs text-gray-500 w-16">Unfiltered:</span>
+                            <audio controls class="h-8 w-64">
+                                <source src="{% url 'play_audio' pk=call.pk %}?type=conversation" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <a href="{% url 'play_audio' pk=call.pk %}?type=conversation&download=true"
+                                class="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                title="Download Unfiltered">
+                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </li>
@@ -74,7 +96,9 @@
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
                 <p class="text-sm text-gray-700">
-                    Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                    Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span
+                        class="font-medium">{{page_obj.end_index }}</span> of <span class="font-medium">{{
+                        page_obj.paginator.count }}</span>
                     results
                 </p>
             </div>
