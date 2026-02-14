@@ -20,12 +20,9 @@ class CallHandler(FileSystemEventHandler):
         filename = os.path.basename(event.src_path)
         if filename.endswith('_full.wav'):
             self.stdout.write(f"Detected new call: {filename}")
-            self.process_file(event.src_path, is_conversation=False)
-        elif filename.endswith('_full_conversation.wav'):
-            self.stdout.write(f"Detected conversation file: {filename}")
-            self.process_file(event.src_path, is_conversation=True)
+            self.process_file(event.src_path)
 
-    def process_file(self, wav_path, is_conversation=False):
+    def process_file(self, wav_path):
         # Wait a brief moment to ensure file write is complete (optional but safer)
         time.sleep(1)
 
@@ -36,12 +33,8 @@ class CallHandler(FileSystemEventHandler):
             filename = os.path.basename(wav_path)
 
             # Extract Session ID
-            if is_conversation:
-                 # format: {caller_id}_{session_id}_full_conversation.wav
-                 base_name = filename.replace('_full_conversation.wav', '')
-            else:
-                 # format: {caller_id}_{session_id}_full.wav
-                 base_name = filename.replace('_full.wav', '')
+            # format: {caller_id}_{session_id}_full.wav
+            base_name = filename.replace('_full.wav', '')
             
             parts = base_name.split('_')
             # Assuming format is always caller_id_sessionid...
@@ -58,37 +51,29 @@ class CallHandler(FileSystemEventHandler):
 
             relative_path = os.path.join(caller_id, filename)
 
-            if is_conversation:
-                # Update existing call with conversation file
-                # We use update_or_create just in case the conversation file comes BEFORE the full.wav (rare but possible)
-                # If call exists, update full_conversation_filename.
-                # If not, create it with just this field (and other defaults)
-                call, created = Call.objects.update_or_create(
-                    session_id=session_id,
-                    defaults={
-                        'user': user,
-                        'caller_id': caller_id,
-                        'full_conversation_filename': relative_path,
-                        # We don't overwrite other fields if they exist, but if creating, we need defaults
-                        # We might need to leave other fields blank if creating from conversation file first
-                    }
-                )
-                if created:
-                     self.stdout.write(self.style.SUCCESS(f"Created partial call record for {session_id} (conversation file first)"))
-                else:
-                     self.stdout.write(self.style.SUCCESS(f"Updated call {session_id} with conversation file"))
-                return
-
             # Normal _full.wav processing
             txt_filename = filename.replace('_full.wav', '_full.txt')
             txt_path = os.path.join(dir_path, txt_filename)
 
-            # Check if conversation file ALREADY exists in this folder (in case we missed the event or doing initial scan)
-            conversation_filename = filename.replace('_full.wav', '_full_conversation.wav')
-            conversation_path = os.path.join(dir_path, conversation_filename)
+            # Check for conversation file in sibling directory: ../{caller_session}/full_conversation.wav
+            # dir_path is likely .../call_sessions/{caller_id}
+            # We need .../sounds/{caller_session}/full_conversation.wav
+            # which is ../../{caller_session}/full_conversation.wav relative to dir_path
+            # OR ../{caller_session}/full_conversation.wav relative to root (call_sessions)
+            
+            # Construct the absolute path to check
+            # We assume dir_path is .../call_sessions/{caller_id}
+            # so dir_path/../../ is .../sounds/
+            sounds_root = os.path.abspath(os.path.join(dir_path, '../../')) 
+            conversation_dir = os.path.join(sounds_root, base_name) # base_name is {caller_id}_{session_id}
+            conversation_file_path = os.path.join(conversation_dir, 'full_conversation.wav')
+            
             full_conv_relative = None
-            if os.path.exists(conversation_path):
-                full_conv_relative = os.path.join(caller_id, conversation_filename)
+            if os.path.exists(conversation_file_path):
+                # Store relative to call_sessions (which is the settings.RECORDINGS_ROOT)
+                # So path should be ../{base_name}/full_conversation.wav
+                full_conv_relative = os.path.join('..', base_name, 'full_conversation.wav')
+                self.stdout.write(f"Found conversation file at {full_conv_relative}")
 
             # Metadata
             wav_size = os.path.getsize(wav_path)
@@ -155,9 +140,7 @@ class Command(BaseCommand):
         for root, dirs, files in os.walk(path):
             for file in files:
                 if file.endswith('_full.wav'):
-                    handler.process_file(os.path.join(root, file), is_conversation=False)
-                elif file.endswith('_full_conversation.wav'):
-                     handler.process_file(os.path.join(root, file), is_conversation=True)
+                    handler.process_file(os.path.join(root, file))
         self.stdout.write(self.style.SUCCESS("Initial scan complete."))
 
         self.stdout.write(f"Starting watchdog on {path}...")
