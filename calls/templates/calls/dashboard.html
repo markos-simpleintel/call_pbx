@@ -32,6 +32,9 @@
                             {{ call.created_at|date:"F j, Y, P" }}
                         </p>
                         <p class="mt-1 text-sm text-gray-500">Size: {{ call.wav_size|filesizeformat }}</p>
+                        {% if call.full_conversation_filename %}
+                        <p class="mt-1 text-sm text-gray-500">Transcript: {{ call.full_conversation_filename }}</p>
+                        {% endif %}
                     </div>
                     <div class="flex items-center space-x-4">
                         <audio controls class="h-8 w-64">
