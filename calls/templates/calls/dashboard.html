@@ -44,6 +44,7 @@
                             <h4 class="text-base font-semibold text-blue-400">
                                 Session: {{ call.session_id }}
                             </h4>
+                            <p class="text-sm text-gray-400">Caller: {{ call.caller_id }}</p>
                             <div class="mt-1 flex items-center text-sm text-gray-400 gap-2">
                                 <span>{{ call.created_at|date:"F j, Y, g:i a" }}</span>
                                 <span class="text-gray-600">|</span>

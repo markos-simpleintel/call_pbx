@@ -28,13 +28,18 @@ class DashboardView(LoginRequiredMixin, ListView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        # Filter calls by the logged-in user
+        # Admin sees all calls, regular user sees only their own
+        if self.request.user.is_staff:
+             return Call.objects.all().order_by('-created_at')
         return Call.objects.filter(user=self.request.user).order_by('-created_at')
 
 class PlayAudioView(LoginRequiredMixin, View):
     def get(self, request, pk):
         try:
-            call = Call.objects.get(pk=pk, user=request.user)
+            if request.user.is_staff:
+                call = Call.objects.get(pk=pk)
+            else:
+                call = Call.objects.get(pk=pk, user=request.user)
         except Call.DoesNotExist:
             raise Http404("Call not found")
 
