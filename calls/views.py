@@ -30,8 +30,20 @@ class DashboardView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Admin sees all calls, regular user sees only their own
         if self.request.user.is_staff:
-             return Call.objects.all().order_by('-created_at')
-        return Call.objects.filter(user=self.request.user).order_by('-created_at')
+             queryset = Call.objects.all()
+        else:
+             queryset = Call.objects.filter(user=self.request.user)
+        
+        # Search filtering
+        search_query = self.request.GET.get('q')
+        if search_query:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(caller_id__icontains=search_query) | 
+                Q(session_id__icontains=search_query)
+            )
+            
+        return queryset.order_by('-created_at')
 
 class PlayAudioView(LoginRequiredMixin, View):
     def get(self, request, pk):
