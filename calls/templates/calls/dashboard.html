@@ -7,13 +7,34 @@
     <!-- Main Card Container -->
     <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8">
 
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-            <div>
+        <!-- Header & Search -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-4">
+            <div class="flex-1">
                 <h3 class="text-2xl font-bold text-white">Call History</h3>
                 <p class="mt-1 text-sm text-gray-400">Recordings for {{ user.phone_number }}</p>
             </div>
-            <div class="mt-4 sm:mt-0">
+
+            <!-- Search Form -->
+            <form method="get" class="flex-1 max-w-md w-full">
+                <div class="relative group">
+                    <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
+                        placeholder="Search by Number or Session ID..."
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none">
+                    <button type="submit"
+                        class="absolute right-3 top-2.5 text-gray-400 group-hover:text-indigo-400 transition-colors">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                    {% if request.GET.q %}
+                    <a href="?"
+                        class="absolute right-10 top-2.5 text-gray-500 hover:text-red-400 text-xs font-bold transition-colors">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+
+            <div class="flex-shrink-0">
                 <span
                     class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-900/50 text-blue-200 border border-blue-800">
                     Total Calls: {{ page_obj.paginator.count|default:"0" }}
@@ -46,10 +67,6 @@
                             </h4>
                             <div class="flex items-center gap-2">
                                 <span class="text-sm font-bold text-indigo-300">Caller: {{ call.caller_id }}</span>
-                                {% if not call.user %}
-                                <span
-                                    class="text-[10px] px-1.5 py-0.5 rounded bg-yellow-900/30 text-yellow-500 border border-yellow-800/50">Unregistered</span>
-                                {% endif %}
                             </div>
                             <div class="mt-1 flex items-center text-sm text-gray-400 gap-2">
                                 <span>{{ call.created_at|date:"F j, Y, g:i a" }}</span>
