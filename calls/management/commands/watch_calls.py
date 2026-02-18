@@ -42,24 +42,14 @@ class Command(BaseCommand):
         if not os.path.exists(path):
             self.stdout.write(self.style.WARNING(f"Path {path} does not exist. Waiting..."))
             
-        # Initial Scan (Optimized for performance)
-        self.stdout.write(f"Performing initial scan of {path} for registered users...")
+        # Initial Scan (Global scan for all calls)
+        self.stdout.write(f"Performing initial scan of {path} for all calls...")
         handler = CallHandler(self.stdout, self.style)
         
-        # Only scan folders of registered users
-        registered_numbers = User.objects.values_list('phone_number', flat=True)
-        
-        for phone_number in registered_numbers:
-            user_dir = os.path.join(path, phone_number)
-            if os.path.exists(user_dir):
-                # self.stdout.write(f"Scanning calls for {phone_number}...")
-                for root, dirs, files in os.walk(user_dir):
-                    for file in files:
-                        if file.endswith('_full.wav'):
-                            handler.process_file(os.path.join(root, file))
-            else:
-                # User might not have any calls folder yet
-                pass
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if file.endswith('_full.wav'):
+                    handler.process_file(os.path.join(root, file))
                 
         self.stdout.write(self.style.SUCCESS("Initial scan complete."))
 

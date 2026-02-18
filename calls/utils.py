@@ -26,8 +26,7 @@ def process_call_file(wav_path, stdout=None, style=None):
         user = User.objects.filter(phone_number=caller_id).first()
         if not user:
             if stdout:
-                stdout.write(style.WARNING(f"Ignored file from {caller_id}: User not registered."))
-            return False
+                stdout.write(style.WARNING(f"File from {caller_id}: User not registered. Saving as unassociated."))
 
         relative_path = os.path.join(caller_id, filename)
 

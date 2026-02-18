@@ -44,7 +44,13 @@
                             <h4 class="text-base font-semibold text-blue-400">
                                 Session: {{ call.session_id }}
                             </h4>
-                            <p class="text-sm text-gray-400">Caller: {{ call.caller_id }}</p>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-indigo-300">Caller: {{ call.caller_id }}</span>
+                                {% if not call.user %}
+                                <span
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-yellow-900/30 text-yellow-500 border border-yellow-800/50">Unregistered</span>
+                                {% endif %}
+                            </div>
                             <div class="mt-1 flex items-center text-sm text-gray-400 gap-2">
                                 <span>{{ call.created_at|date:"F j, Y, g:i a" }}</span>
                                 <span class="text-gray-600">|</span>
