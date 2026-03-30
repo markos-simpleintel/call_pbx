@@ -35,7 +35,7 @@ def process_call_file(wav_path, stdout=None, style=None):
         txt_path = os.path.join(dir_path, txt_filename)
 
         # Check for conversation file in session subdirectory (dialplan: CALL_SESSION_DIR = call_sessions/{CALLER}/{SESSION})
-        conversation_file_path = os.path.join(dir_path, session_id, 'full_conversation.wav')
+        conversation_file_path = os.path.join(dir_path, session_id, 'full_conversation_unfiltered.wav')
 
         full_conv_relative = None
         if os.path.exists(conversation_file_path):
