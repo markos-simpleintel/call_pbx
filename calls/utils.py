@@ -34,14 +34,13 @@ def process_call_file(wav_path, stdout=None, style=None):
         txt_filename = filename.replace('_full.wav', '_full.txt')
         txt_path = os.path.join(dir_path, txt_filename)
 
-        # Check for conversation file in sibling directory: ../{caller_session}/full_conversation.wav
-        sounds_root = os.path.abspath(os.path.join(dir_path, '../../')) 
-        conversation_dir = os.path.join(sounds_root, base_name) # base_name is {caller_id}_{session_id}
-        conversation_file_path = os.path.join(conversation_dir, 'full_conversation.wav')
-        
+        # Check for conversation file in session subdirectory (dialplan: CALL_SESSION_DIR = call_sessions/{CALLER}/{SESSION})
+        conversation_file_path = os.path.join(dir_path, session_id, 'full_conversation.wav')
+
         full_conv_relative = None
         if os.path.exists(conversation_file_path):
-            full_conv_relative = os.path.join('..', base_name, 'full_conversation.wav')
+            recordings_root = getattr(settings, 'RECORDINGS_ROOT', '/usr/local/share/asterisk/sounds/call_sessions')
+            full_conv_relative = os.path.relpath(conversation_file_path, recordings_root)
             if stdout:
                 stdout.write(f"Found conversation file at {full_conv_relative}")
 
