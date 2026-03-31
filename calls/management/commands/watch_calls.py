@@ -36,22 +36,22 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str, default='/usr/local/share/asterisk/sounds/call_sessions', help='Path to watch')
+        parser.add_argument('--scan', action='store_true', help='Run an initial scan of all existing recordings before watching')
 
     def handle(self, *args, **options):
         path = options['path']
         if not os.path.exists(path):
             self.stdout.write(self.style.WARNING(f"Path {path} does not exist. Waiting..."))
-            
-        # Initial Scan (Global scan for all calls)
-        self.stdout.write(f"Performing initial scan of {path} for all calls...")
+
         handler = CallHandler(self.stdout, self.style)
-        
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                if file.endswith('_full.wav'):
-                    handler.process_file(os.path.join(root, file))
-                
-        self.stdout.write(self.style.SUCCESS("Initial scan complete."))
+
+        if options['scan']:
+            self.stdout.write(f"Performing initial scan of {path} for all calls...")
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    if file.endswith('_full.wav'):
+                        handler.process_file(os.path.join(root, file))
+            self.stdout.write(self.style.SUCCESS("Initial scan complete."))
 
         self.stdout.write(f"Starting watchdog on {path}...")
         
